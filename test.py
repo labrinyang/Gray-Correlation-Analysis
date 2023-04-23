@@ -1,4 +1,5 @@
 import pandas as pd
+
 from gray_analysis import gray_corr
 
 a = pd.DataFrame([[1.1, 1.8, 4, 80],

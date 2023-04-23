@@ -1,6 +1,9 @@
-import pandas as pd
 import numpy as np
-from data_pretreatment import DataPretreatment
+import pandas as pd
+
+from common.data_pretreatment import DataPretreatment
+
+
 class GrayCorrelation:
     """
     灰色关联度综合评价分析法
