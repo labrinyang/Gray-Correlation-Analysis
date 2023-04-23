@@ -22,7 +22,9 @@ class GrayCorrelation:
         self.target = np.array(dmax)
 
     def correlation(self):
-        """ 计算关联系数 """
+        """
+        计算关联系数
+         """
         self.make_target()
         data = -(self.data - self.target[:, np.newaxis])
         dmax = data.max().max()
@@ -32,8 +34,23 @@ class GrayCorrelation:
         data = data.apply(lambda x: ((dmin+(self.rho)*dmax)/(x+(self.rho)*dmax)), axis=1)
         self.result = data.mean(axis=1)
 
-def gray_corr(data, negtive_list, positive_list):
-    """ 计算灰色关联度 """
+def gray_corr(data, negtive_list, positive_list, transpose=False, rho=0.5, show=False):
+    """
+    # 计算灰色关联度
+
+    data: 数据
+
+    negtive_list: 负向指标列表
+
+    positive_list: 正向指标列表
+
+    transpose: 是否转置(默认为False,请保证每行是一个评价对象，每列是一个评价指标)
+
+    rho: 灰色关联度参数(默认为0.5)
+
+    show: 是否打印带评价对象名的结果(默认为False)
+
+    """
     a=data
     for i in negtive_list:
         pre = DataPretreatment(a.iloc[:,i], do_forward=True, do_normalize=True)
@@ -45,8 +62,12 @@ def gray_corr(data, negtive_list, positive_list):
         pre.pretreatment()
         a.iloc[:,i] = pre.result
 
-    gray = GrayCorrelation(a)
+    gray = GrayCorrelation(a, transpose=transpose, rho=rho)
     gray.correlation()
+
+    if show:
+        gray.result.index = data.index
+        return gray.result
 
     return gray.result
 
