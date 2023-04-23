@@ -37,7 +37,7 @@ class GrayCorrelation:
         data = data.apply(lambda x: ((dmin+(self.rho)*dmax)/(x+(self.rho)*dmax)), axis=1)
         self.result = data.mean(axis=1)
 
-def gray_corr(data, negtive_list, positive_list, transpose=False, rho=0.5, show=False):
+def gray_corr(data, negtive_list=None, positive_list=None, transpose=False, rho=0.5, show=False):
     """
     # 计算灰色关联度
 
@@ -55,21 +55,24 @@ def gray_corr(data, negtive_list, positive_list, transpose=False, rho=0.5, show=
 
     """
     a=data
-    for i in negtive_list:
-        pre = DataPretreatment(a.iloc[:,i], do_forward=True, do_normalize=True)
-        pre.pretreatment()
-        a.iloc[:,i] = pre.result
+    if negtive_list!=None:
+        for i in negtive_list:
+            pre = DataPretreatment(a.iloc[:,i], do_forward=True, do_normalize=True)
+            pre.pretreatment()
+            a.iloc[:,i] = pre.result
 
-    for i in positive_list:
-        pre = DataPretreatment(a.iloc[:,i], do_forward=False, do_normalize=True)
-        pre.pretreatment()
-        a.iloc[:,i] = pre.result
+    if positive_list!=None:
+        for i in positive_list:
+            pre = DataPretreatment(a.iloc[:,i], do_forward=False, do_normalize=True)
+            pre.pretreatment()
+            a.iloc[:,i] = pre.result
 
     gray = GrayCorrelation(a, transpose=transpose, rho=rho)
     gray.correlation()
 
     if show:
         gray.result.index = data.index
+        gray.result.to_csv('gray.csv')
         return gray.result
 
     return gray.result
