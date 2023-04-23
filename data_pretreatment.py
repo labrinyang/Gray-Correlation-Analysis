@@ -12,12 +12,15 @@ class DataPretreatment:
         """ 同向化函数，将数据转换为正向数据 """
         if self.do_forward:
             data = data.apply(lambda x: 1/x)
+        else:
+            data = data
         return data
+
 
     def apply_normalize(self, data):
         """ 无量纲化函数，将数据转换为无量纲数据 """
         if self.do_normalize:
-            m = max(data)
+            m = data.max()
             data = data.apply(lambda x: x/m)
         return data
 

@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from data_pretreatment import DataPretreatment
 class GrayCorrelation:
     """
     灰色关联度综合评价分析法
@@ -16,14 +17,9 @@ class GrayCorrelation:
         """ 生成目标函数 """
         if self.transpose:
             self.data = self.data.T
-        else:
-            pass
 
-        if self.target is not None:
-            dmax = self.data.max(axis=1)
-            self.target = np.array(dmax)
-        else:
-            pass
+        dmax = (self.data).max(axis=1)
+        self.target = np.array(dmax)
 
     def correlation(self):
         """ 计算关联系数 """
@@ -33,9 +29,25 @@ class GrayCorrelation:
         dmin = data.min().min()
 
         data = pd.DataFrame(data)
-        data.apply(lambda x: ((dmin-self.rho*dmax)/(x-self.rho*dmax)), axis=1)
+        data = data.apply(lambda x: ((dmin+(self.rho)*dmax)/(x+(self.rho)*dmax)), axis=1)
         self.result = data.mean(axis=1)
 
+def gray_corr(data, negtive_list, positive_list):
+    """ 计算灰色关联度 """
+    a=data
+    for i in negtive_list:
+        pre = DataPretreatment(a.iloc[:,i], do_forward=True, do_normalize=True)
+        pre.pretreatment()
+        a.iloc[:,i] = pre.result
 
+    for i in positive_list:
+        pre = DataPretreatment(a.iloc[:,i], do_forward=False, do_normalize=True)
+        pre.pretreatment()
+        a.iloc[:,i] = pre.result
+
+    gray = GrayCorrelation(a)
+    gray.correlation()
+
+    return gray.result
 
 
