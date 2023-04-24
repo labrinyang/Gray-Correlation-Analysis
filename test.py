@@ -11,5 +11,7 @@ a = pd.DataFrame([[8, 9, 8, 7, 5, 2, 9],
 # rename index as A, B, C
 a.index = [1, 2, 3, 4, 5, 6]
 
-re = gray_corr(a, [0, 1, 2, 3, 3, 4, 5, 6], show=True)
+re = gray_corr(a, positive_list=[0, 1, 2, 3, 3, 4, 5, 6], show=True)
+re = pd.DataFrame(re)
+re.sort_values(by=0, ascending=False, inplace=True)
 print(re)
