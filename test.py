@@ -1,6 +1,5 @@
 import unittest
 import pandas as pd
-from common.data_pretreatment import DataPretreatment
 from gray_correlation import gray_corr
 
 class TestGrayCorrelation(unittest.TestCase):
