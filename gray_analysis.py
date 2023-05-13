@@ -38,7 +38,7 @@ class GrayCorrelation:
         return data.mean(axis=1)
 
 
-def gray_corr(data, negtive_list=None, positive_list=None, transpose=False, rho=0.5, show=False):
+def gray_corr(data, negtive_list=None, positive_list=None, transpose=False, rho=0.5, store=False, sort=False,):
     """
     # 计算灰色关联度
 
@@ -52,7 +52,9 @@ def gray_corr(data, negtive_list=None, positive_list=None, transpose=False, rho=
 
     rho: 灰色关联度参数(默认为0.5)
 
-    show: 是否打印带评价对象名的结果(默认为False)
+    store: 是否保存结果(默认为False)
+
+    sort: 是否排序(默认为False)
 
     """
     if negtive_list is not None:
@@ -70,8 +72,12 @@ def gray_corr(data, negtive_list=None, positive_list=None, transpose=False, rho=
     gray = GrayCorrelation(data, transpose=transpose, rho=rho)
     result = gray.calculate_correlation()
 
-    if show:
-        result.index = data.index
+    result.index = data.index
+
+    if sort:
+        result.sort_values(ascending=False, inplace=True)
+
+    if store:
         result.to_csv('gray.csv')
 
     return result
