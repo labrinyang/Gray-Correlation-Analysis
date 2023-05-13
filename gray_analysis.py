@@ -9,37 +9,34 @@ class GrayCorrelation:
     灰色关联度综合评价分析法
     请保证每行是一个评价对象，每列是一个评价指标，且每个评价指标完成了同向化与标准化
     """
-    def __init__(self, data, target=None, transpose=False, rho=0.5, result=None, dmax=None, dmin=None,):
+
+    def __init__(self, data, target=None, transpose=False, rho=0.5):
         self.data = np.array(data)
         self.target = target
         self.transpose = transpose
         self.rho = rho
-        self.result = result
-        self.dmax = dmax
-        self.dmin = dmin
 
     def make_target(self):
         """ 生成目标函数 """
         if self.transpose:
             self.data = self.data.T
 
-        target_list = (self.data).max(axis=0)
+        target_list = self.data.max(axis=0)
         self.target = np.array(target_list)
-        print(target_list)
 
-    def correlation(self):
+    def calculate_correlation(self):
         """
         计算关联系数
          """
         self.make_target()
         data = -(self.data - self.target[np.newaxis])
-        print(data)
-        self.dmax = data.max().max()
-        self.dmin = data.min().min()
+        dmax = data.max().max()
+        dmin = data.min().min()
 
         data = pd.DataFrame(data)
-        data = data.apply(lambda x: ((self.dmin+(self.rho)*self.dmax)/(x+(self.rho)*self.dmax)), axis=1)
-        self.result = data.mean(axis=1)
+        data = data.apply(lambda x: ((dmin + self.rho * dmax) / (x + self.rho * dmax)), axis=1)
+        return data.mean(axis=1)
+
 
 def gray_corr(data, negtive_list=None, positive_list=None, transpose=False, rho=0.5, show=False):
     """
@@ -58,26 +55,23 @@ def gray_corr(data, negtive_list=None, positive_list=None, transpose=False, rho=
     show: 是否打印带评价对象名的结果(默认为False)
 
     """
-    a=data
-    if negtive_list!=None:
+    if negtive_list is not None:
         for i in negtive_list:
-            pre = DataPretreatment(a.iloc[:,i], do_forward=True, do_normalize=True)
+            pre = DataPretreatment(data.iloc[:, i], do_forward=True, do_normalize=True)
             pre.pretreatment()
-            a.iloc[:,i] = pre.result
+            data.iloc[:, i] = pre.result
 
-    if positive_list!=None:
+    if positive_list is not None:
         for i in positive_list:
-            pre = DataPretreatment(a.iloc[:,i], do_forward=False, do_normalize=True)
+            pre = DataPretreatment(data.iloc[:, i], do_forward=False, do_normalize=True)
             pre.pretreatment()
-            a.iloc[:,i] = pre.result
-    gray = GrayCorrelation(a, transpose=transpose, rho=rho)
-    gray.correlation()
+            data.iloc[:, i] = pre.result
+
+    gray = GrayCorrelation(data, transpose=transpose, rho=rho)
+    result = gray.calculate_correlation()
 
     if show:
-        gray.result.index = data.index
-        gray.result.to_csv('gray.csv')
-        return gray.result
+        result.index = data.index
+        result.to_csv('gray.csv')
 
-    return gray.result
-
-
+    return result
